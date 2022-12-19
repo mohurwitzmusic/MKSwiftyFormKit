@@ -1,3 +1,3 @@
 # MKSwiftyFormKit
 
-A description of this package.
+A package that greatly simpifies the creation of UITableView based forms.
