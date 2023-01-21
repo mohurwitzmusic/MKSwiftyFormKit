@@ -8,10 +8,12 @@ open class MKFormSliderCell: MKFormCell {
     open var sliderValueChangedHandler: ((MKFormSliderCell) -> Void)?
     open var sliderTouchesEndedHandler: ((MKFormSliderCell) -> Void)?
     open var sliderTouchesBeganHandler: ((MKFormSliderCell) -> Void)?
+    open var fieldProvider: ((MKFormSliderCell) -> MKFormSliderField)?
     
-    open func refresh(field: MKFormSliderField, animated: Bool) {
-        self.isUserInteractionEnabled = !field.isDisabled
-        self.slider.isEnabled = !field.isDisabled
+    open func refresh(animated: Bool) {
+        guard let field = self.fieldProvider?(self) else { return }
+        self.isUserInteractionEnabled = field.displayState.isEnabled
+        self.slider.isEnabled = field.displayState.isEnabled
         self.slider.setValue(field.value, animated: animated)
     }
 
@@ -71,6 +73,15 @@ public extension MKFormSliderCell {
         self.sliderTouchesEndedHandler =  { [weak target] cell in
             guard let target else { return }
             handler(target, cell)
+        }
+        return self
+    }
+    
+    @discardableResult
+    func withFieldProvider<T: AnyObject>(source: T, handler: @escaping ((T, MKFormSliderCell) -> MKFormSliderField)) -> Self {
+        fieldProvider = { [weak source] cell in
+            guard let source else { return .init(id: "") }
+            return handler(source, cell)
         }
         return self
     }

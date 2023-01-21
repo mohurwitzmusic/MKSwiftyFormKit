@@ -1,6 +1,6 @@
 import UIKit
 
-public struct MKFormPickerMenuField<T: Equatable>: MKFormField, Identifiable, UIListContentConfigurable {
+public struct MKFormPickerMenuField<T: Equatable>: Equatable, MKFormField, Identifiable, UIListContentConfigurable {
     
     public struct MenuItem: Equatable {
         public let id: T
@@ -14,7 +14,7 @@ public struct MKFormPickerMenuField<T: Equatable>: MKFormField, Identifiable, UI
     }
     
     public let id: String
-    public var isDisabled = false
+    public var displayState = MKFormFieldDisplayState()
     public var contentConfiguration = UIListContentConfiguration.cell()
     public var openMenuButtonConfiguration = UIButton.Configuration.plain()
     public  var menuItems = [MenuItem]()
@@ -24,6 +24,16 @@ public struct MKFormPickerMenuField<T: Equatable>: MKFormField, Identifiable, UI
         openMenuButtonConfiguration.imagePadding = 5
         openMenuButtonConfiguration.image = .init(systemName: "chevron.up.chevron.down")
     }
+}
+
+public extension MKFormPickerMenuField {
+    
+    func buttonTitle(_ title: String) -> Self {
+        var copy = self
+        copy.openMenuButtonConfiguration.title = title
+        return copy
+    }
+    
 }
 
 public extension MKFormPickerMenuField where T : BinaryInteger, T : Comparable, T : Strideable, T.Stride == Int {
@@ -42,23 +52,13 @@ public extension MKFormPickerMenuField where T : BinaryInteger, T : Comparable, 
     
 }
 
-public extension MKFormPickerMenuField where T : CaseIterable & CustomStringConvertible {
-    
-    static func allCases(id: String, selected: T) -> MKFormPickerMenuField<T> {
-        guard T.allCases.contains(selected) else {
-            fatalError("Selected item \(selected) not contained in allCases of \(T.self)")
-        }
-        var field = Self(id: id)
-        field.menuItems = T.allCases.map { element in
-                .init(id: element, title: element.description, isSelected: selected == element)
-        }
-        field.openMenuButtonConfiguration.title = "\(selected)"
-        return field
-    }
-}
 
 
 extension MKFormPickerMenuField.MenuItem : Identifiable where T : Hashable {
-    
-    
+    public typealias ID = T
 }
+
+extension MKFormPickerMenuField.MenuItem : Hashable where T : Hashable { }
+
+extension MKFormPickerMenuField: Hashable where T : Hashable { }
+

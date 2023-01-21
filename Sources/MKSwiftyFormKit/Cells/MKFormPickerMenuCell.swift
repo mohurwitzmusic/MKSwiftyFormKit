@@ -10,9 +10,12 @@ open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
 
     public var selectionHandler: ((MKFormPickerMenuCell, T) -> Void)?
     
-    public func refresh(field: MKFormPickerMenuField<T>) {
-        isUserInteractionEnabled = !field.isDisabled
-        openMenuButton.isEnabled = !field.isDisabled
+    open var fieldProvider: ((MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>)?
+    
+    open func refresh() {
+        guard let field = fieldProvider?(self) else { return }
+        isUserInteractionEnabled =  field.displayState.isEnabled
+        openMenuButton.isEnabled =  field.displayState.isEnabled
         contentConfiguration = field.contentConfiguration.updated(for: configurationState)
         openMenuButton.configuration = field.openMenuButtonConfiguration.updated(for: openMenuButton)
         let actions = field.menuItems.map { item in
@@ -60,6 +63,16 @@ public extension MKFormPickerMenuCell {
         selectionHandler = { [weak target] cell, id in
             guard let target else { return }
             handler(target, cell, id)
+        }
+        return self
+    }
+    
+    
+    @discardableResult
+    func withFieldProvider<U: AnyObject>(source: U, handler: @escaping ((U, MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>)) -> Self {
+        fieldProvider = { [weak source] cell in
+            guard let source else { return .init(id: "") }
+            return handler(source, cell)
         }
         return self
     }

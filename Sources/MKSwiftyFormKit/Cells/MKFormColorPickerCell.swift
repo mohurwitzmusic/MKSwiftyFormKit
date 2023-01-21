@@ -14,9 +14,12 @@ open class MKFormColorPickerCell: MKFormCell {
         set { colorWell.selectedColor = newValue }
     }
     
-    public func refresh(field: MKFormColorField) {
-        self.isUserInteractionEnabled = !field.isDisabled
-        self.colorWell.isEnabled = !field.isDisabled
+    open var fieldProvider: ((MKFormColorPickerCell) -> MKFormColorField)?
+    
+    open func refresh() {
+        guard let field = fieldProvider?(self) else { return }
+        self.isUserInteractionEnabled = field.displayState.isEnabled
+        self.colorWell.isEnabled =  field.displayState.isEnabled
         self.contentConfiguration = field.contentConfiguration.updated(for: configurationState)
         self.colorWell.selectedColor = field.color
     }
@@ -32,6 +35,15 @@ open class MKFormColorPickerCell: MKFormCell {
     @discardableResult
     open func onColorButtonTapped(_ handler: @escaping ((MKFormColorPickerCell) -> Void)) -> Self {
         self.colorButonTappedHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    open func withFieldProvider<T: AnyObject>(source: T, handler: @escaping ((T, MKFormColorPickerCell) -> MKFormColorField)) -> Self {
+        fieldProvider = { [weak source] cell in
+            guard let source else { return .init(id: "", color: .gray) }
+            return handler(source, cell)
+        }
         return self
     }
     

@@ -13,9 +13,9 @@ import UIKit
 /// A number of predefined colors are available as extensions on `MKColorMenuField.MenuItem`,
 /// as well as on static methods on `Array<MKFormColorMenuField.MenuItem>`.
 
-public struct MKFormColorMenuField: MKFormField, UIListContentConfigurable {
+public struct MKFormColorMenuField: Hashable, MKFormField, UIListContentConfigurable {
     
-    public struct MenuItem {
+    public struct MenuItem: Hashable {
         public let name: String
         public let color: UIColor
         public init(name: String, color: UIColor) {
@@ -25,21 +25,20 @@ public struct MKFormColorMenuField: MKFormField, UIListContentConfigurable {
     }
     
     public let id: String
-    public var isDisabled: Bool = false
+    public var displayState = MKFormFieldDisplayState()
+
+    /// A list of available colors,  each with a descriptive name for the color.
+    
     public let menuItems: [MenuItem]
     public var selectedColor: UIColor
     public var contentConfiguration: UIListContentConfiguration = .cell()
     
     
-    /// Initializes a new `MKColorMenuField` with the selected color. The menu must not be empty.
+    /// Initializes a new `MKColorMenuField` with the selected color. `menuItems` must not be empty.
     ///
-    /// **Important**: The selectedColor is not guaranteed to be one of the colors in the menu.
-    ///
-    /// Use the initializer `init(id:menuItems:closestMenuColorTo:)`
-    /// to find the closest color in the menu.
-    ///
-    /// There is also equivalent view modifier `selectingClosestColor(to:)` that can be used after initialization.
-    
+    /// **Important**:  `selectedColor` is not guaranteed to be one of the colors in the menu. Use the view modifier
+    /// `selectingClosestColor(to:)` to assign the closest color to one of the colors in the menu.
+        
     public init(id: String, menuItems: [MenuItem] = .systemRainbow(), selectedColor: UIColor) {
         guard menuItems.count > 0 else {
             fatalError("Color menu items cannot be empty")
@@ -47,30 +46,32 @@ public struct MKFormColorMenuField: MKFormField, UIListContentConfigurable {
         self.id = id
         self.menuItems = menuItems
         self.selectedColor = selectedColor
-        self.contentConfiguration.text = "Color"
     }
     
     
-    /// Initializes a new `MKColorMenuField` selecting the most similar color to the colors provided.
+    /// Initializes a new `MKColorMenuField`, automatically selecting the first color in the menu.
+    /// `menuItems` must not be empty.
+    ///
+    /// After initialization, use the view modifer
+    /// `selectingClosestColor(to:)` to assign the closest color to one of the colors in the menu.
     
-    public init(id: String, menuItems: [MenuItem] = .systemRainbow(), selectingClosestColorTo color: UIColor) {
+    public init(id: String, menuItems: [MenuItem] = .systemRainbow()) {
         guard menuItems.count > 0 else {
             fatalError("Color menu items cannot be empty")
         }
         self.id = id
         self.menuItems = menuItems
-        let closestIndex = menuItems.map { $0.color }.firstIndex(closestTo: color)
-        self.selectedColor = menuItems[closestIndex].color
-        self.contentConfiguration.text = "Color"
+        self.selectedColor = menuItems.first!.color
     }
   
-    /// Selects the closest color to one of the colors in the `menuItems` larray.
+    /// Sets `selectedColor` to the closest color in `menuItems`.
     
     @discardableResult
-    public mutating func selectingClosestColor(to color: UIColor) -> Self {
+    public func selectingClosestColor(to color: UIColor) -> Self {
+        var copy = self
         let index = menuItems.map { $0.color }.firstIndex(closestTo: color)
-        self.selectedColor = menuItems[index].color
-        return self
+        copy.selectedColor = menuItems[index].color
+        return copy
     }
 }
 
@@ -81,16 +82,17 @@ public extension Array where Element == MKFormColorMenuField.MenuItem {
         [
         .systemGray,
         .systemRed,
-        .systemOrange,
         .systemPink,
+        .systemOrange,
+        .systemBrown,
         .systemYellow,
-        .systemMint,
         .systemGreen,
+        .systemMint,
         .systemTeal,
+        .systemCyan,
         .systemBlue,
         .systemIndigo,
         .systemPurple,
-        .systemCyan,
         ]
     }
     
@@ -101,6 +103,7 @@ public extension MKFormColorMenuField.MenuItem {
     static var systemRed: Self { .init(name: "Red", color: .systemRed) }
     static var systemPink: Self { .init(name: "Pink", color: .systemPink) }
     static var systemOrange: Self { .init(name: "Orange", color: .systemOrange) }
+    static var systemBrown: Self { .init(name: "Brown", color: .systemBrown)}
     static var systemYellow: Self { .init(name: "Yellow", color: .systemYellow) }
     static var systemMint: Self { .init(name: "Mint", color: .systemMint) }
     static var systemGreen: Self { .init(name: "Green", color: .systemGreen)}
@@ -109,6 +112,5 @@ public extension MKFormColorMenuField.MenuItem {
     static var systemIndigo: Self { .init(name: "Indigo", color: .systemIndigo) }
     static var systemPurple: Self { .init(name: "Purple", color: .systemPurple) }
     static var systemCyan: Self { .init(name: "Cyan", color: .systemCyan) }
-    
 }
 
