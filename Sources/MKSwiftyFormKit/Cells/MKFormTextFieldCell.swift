@@ -9,6 +9,12 @@ open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
     public var textFieldDidBeginEditingHandler: ((MKFormTextFieldCell) -> Void)?
     public var textFieldEditingChangedHandler: ((MKFormTextFieldCell) -> Void)?
     
+    public convenience init(autocorrectionType: UITextAutocorrectionType, spellCheckingType: UITextSpellCheckingType) {
+        self.init(style: .default, reuseIdentifier: nil)
+        textField.autocorrectionType = autocorrectionType
+        textField.spellCheckingType = spellCheckingType
+    }
+    
     open override func setup() {
         selectionStyle = .none
         textField.delegate = self
