@@ -9,11 +9,42 @@ open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
     public var textFieldDidBeginEditingHandler: ((MKFormTextFieldCell) -> Void)?
     public var textFieldEditingChangedHandler: ((MKFormTextFieldCell) -> Void)?
     
-    public convenience init(autocorrectionType: UITextAutocorrectionType, spellCheckingType: UITextSpellCheckingType) {
-        self.init(style: .default, reuseIdentifier: nil)
-        textField.autocorrectionType = autocorrectionType
-        textField.spellCheckingType = spellCheckingType
+    open private(set) var field = MKFormTextField(id: "")
+    
+    public func refresh(field: MKFormTextField) {
+        self.field = field
+        textField.configure(field.textFieldConfiguration)
+        textField.isUserInteractionEnabled = field.displayState.isEnabled
+        textField.isEnabled = field.displayState.isEnabled
+        setNeedsUpdateConfiguration()
     }
+    
+    public init(size: AccessoryLayout.Size = .automatic) {
+        super.init(style: .default, reuseIdentifier: nil)
+        switch size {
+        case .automatic:
+            contentView.addSubview(textField)
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+                textField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+                textField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+                textField.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)
+            ])
+        case .fractional(let width):
+            accessoryView = textField
+            accessoryLayout.width = .fractional(width)
+        case .fixed(let width):
+            accessoryView = textField
+            accessoryLayout.width = .fixed(width)
+        }
+    }
+    
+    public required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+
     
     open override func setup() {
         selectionStyle = .none
@@ -22,7 +53,15 @@ open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
     }
 
     @objc private func textFieldValueChanged(_ sender: UITextField) {
+        field.textFieldConfiguration.text = sender.text
         self.textFieldEditingChangedHandler?(self)
+    }
+    
+    open override func updateConfiguration(using state: UICellConfigurationState) {
+        if textField.superview == contentView {
+            return
+        }
+        self.contentConfiguration = field.contentConfiguration.updated(for: state)
     }
     
 }

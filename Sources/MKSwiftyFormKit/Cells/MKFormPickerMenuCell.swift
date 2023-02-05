@@ -1,8 +1,6 @@
 import UIKit
 
 
-
-
 @available(iOS 15, *)
 open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
 
@@ -10,10 +8,10 @@ open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
 
     public var selectionHandler: ((MKFormPickerMenuCell, T) -> Void)?
     
-    open var fieldProvider: ((MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>)?
-    
-    open func refresh() {
-        guard let field = fieldProvider?(self) else { return }
+    open private(set) var field: MKFormPickerMenuField<T>?
+        
+    open func refresh(field: MKFormPickerMenuField<T>) {
+        self.field = field
         isUserInteractionEnabled =  field.displayState.isEnabled
         openMenuButton.isEnabled =  field.displayState.isEnabled
         contentConfiguration = field.contentConfiguration.updated(for: configurationState)
@@ -66,16 +64,7 @@ public extension MKFormPickerMenuCell {
         }
         return self
     }
-    
-    
-    @discardableResult
-    func withFieldProvider<U: AnyObject>(source: U, handler: @escaping ((U, MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>)) -> Self {
-        fieldProvider = { [weak source] cell in
-            guard let source else { return .init(id: "") }
-            return handler(source, cell)
-        }
-        return self
-    }
+
 }
 
 

@@ -5,10 +5,11 @@ open class MKFormToggleCell: MKFormCell {
     
     open var toggle = UISwitch()
     open var toggleValueChangedHandler: ((MKFormToggleCell) -> Void)?
-    open var fieldProvider: ((MKFormToggleCell) -> MKFormToggleField)?
     
-    open func refresh(animated: Bool) {
-        guard let field = self.fieldProvider?(self) else { return }
+    open private(set) var field = MKFormToggleField(id: "")
+    
+    open func refresh(field: MKFormToggleField, animated: Bool) {
+        self.field = field
         self.isUserInteractionEnabled =  field.displayState.isEnabled
         self.toggle.isEnabled =  field.displayState.isEnabled
         self.toggle.setOn(field.isOn, animated: animated)
@@ -22,6 +23,7 @@ open class MKFormToggleCell: MKFormCell {
     }
     
     @objc func _valueChanged() {
+        field.isOn = toggle.isOn
         toggleValueChangedHandler?(self)
     }
     
@@ -43,14 +45,5 @@ public extension MKFormToggleCell {
         }
         return self
     }
-    
-    @discardableResult
-    func withFieldProvider<T: AnyObject>(source: T, handler: @escaping ((T, MKFormToggleCell) -> MKFormToggleField)) -> Self {
-        self.fieldProvider = { [weak source] cell in
-            guard let source else { return .init(id: "", isOn: false) }
-            return handler(source, cell)
-        }
-        return self
-    }
-    
+ 
 }

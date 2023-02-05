@@ -14,10 +14,10 @@ open class MKFormColorPickerCell: MKFormCell {
         set { colorWell.selectedColor = newValue }
     }
     
-    open var fieldProvider: ((MKFormColorPickerCell) -> MKFormColorField)?
+    open private(set) var field: MKFormColorField = .init(id: "", color: .gray)
     
-    open func refresh() {
-        guard let field = fieldProvider?(self) else { return }
+    open func refresh(field: MKFormColorField) {
+        self.field = field
         self.isUserInteractionEnabled = field.displayState.isEnabled
         self.colorWell.isEnabled =  field.displayState.isEnabled
         self.contentConfiguration = field.contentConfiguration.updated(for: configurationState)
@@ -37,16 +37,7 @@ open class MKFormColorPickerCell: MKFormCell {
         self.colorButonTappedHandler = handler
         return self
     }
-    
-    @discardableResult
-    open func withFieldProvider<T: AnyObject>(source: T, handler: @escaping ((T, MKFormColorPickerCell) -> MKFormColorField)) -> Self {
-        fieldProvider = { [weak source] cell in
-            guard let source else { return .init(id: "", color: .gray) }
-            return handler(source, cell)
-        }
-        return self
-    }
-    
+        
      @objc private func recognizeTapGesture(_ gesture: UITapGestureRecognizer) {
          let tapX = gesture.location(in: self).x
          let isMostlyCoveringColorPicker = tapX >= colorWell.frame.minX
