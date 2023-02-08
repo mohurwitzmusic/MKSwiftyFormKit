@@ -3,10 +3,10 @@ import Combine
 
 open class MKFormToggleCell: MKFormCell {
     
-    open var toggle = UISwitch()
-    open var toggleValueChangedHandler: ((MKFormToggleCell) -> Void)?
-    
     open private(set) var field = MKFormToggleField(id: "")
+    open var fieldProvider: ((MKFormToggleCell) -> MKFormToggleField) = { $0.field }
+    open var toggleValueChangedHandler: ((MKFormToggleCell) -> Void)?
+    open var toggle = UISwitch()
     
     open func refresh(field: MKFormToggleField, animated: Bool) {
         self.field = field
@@ -14,6 +14,10 @@ open class MKFormToggleCell: MKFormCell {
         self.toggle.isEnabled =  field.displayState.isEnabled
         self.toggle.setOn(field.isOn, animated: animated)
         self.contentConfiguration = field.contentConfiguration.updated(for: configurationState)
+    }
+    
+    open func refreshWithFieldProvider(animated: Bool) {
+        self.refresh(field: fieldProvider(self), animated: animated)
     }
 
     open override func setup() {
@@ -43,6 +47,12 @@ public extension MKFormToggleCell {
             guard let target else { return }
             handler(target, cell)
         }
+        return self
+    }
+    
+    @discardableResult
+    func withFieldProvider(fieldProvider: @escaping ((MKFormToggleCell) -> MKFormToggleField)) -> Self {
+        self.fieldProvider = fieldProvider
         return self
     }
  

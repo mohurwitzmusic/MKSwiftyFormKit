@@ -3,12 +3,12 @@ import UIKit
 
 @available(iOS 15, *)
 open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
-
-    public let openMenuButton = UIButton(configuration: .plain())
-
-    public var selectionHandler: ((MKFormPickerMenuCell, T) -> Void)?
     
     open private(set) var field: MKFormPickerMenuField<T>?
+    open var selectionHandler: ((MKFormPickerMenuCell, T) -> Void)?
+    open var fieldProvider: ((MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>?) = { $0.field }
+    public let openMenuButton = UIButton(configuration: .plain())
+
         
     open func refresh(field: MKFormPickerMenuField<T>) {
         self.field = field
@@ -23,6 +23,12 @@ open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
             }
         }
         openMenuButton.menu = UIMenu(children: actions)
+    }
+    
+    open func refreshWithFieldProvider() {
+        if let field = fieldProvider(self) {
+            refresh(field: field)
+        }
     }
     
     public override func setup() {
@@ -65,6 +71,11 @@ public extension MKFormPickerMenuCell {
         return self
     }
 
+    @discardableResult
+    func withFieldProvider(fieldProvider: @escaping (MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>) -> Self {
+        self.fieldProvider = fieldProvider
+        return self
+    }
 }
 
 

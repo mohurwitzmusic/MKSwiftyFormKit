@@ -15,6 +15,8 @@ open class MKFormColorPickerCell: MKFormCell {
     }
     
     open private(set) var field: MKFormColorField = .init(id: "", color: .gray)
+    open var fieldProvider: ((MKFormColorPickerCell) -> MKFormColorField) = { $0.field }
+
     
     open func refresh(field: MKFormColorField) {
         self.field = field
@@ -22,6 +24,11 @@ open class MKFormColorPickerCell: MKFormCell {
         self.colorWell.isEnabled =  field.displayState.isEnabled
         self.contentConfiguration = field.contentConfiguration.updated(for: configurationState)
         self.colorWell.selectedColor = field.color
+    }
+    
+    
+    open func refreshWithFieldProvider() {
+        self.refresh(field: fieldProvider(self))
     }
     
     open override func setup() {
@@ -45,4 +52,10 @@ open class MKFormColorPickerCell: MKFormCell {
              colorButonTappedHandler?(self)
          }
      }
+    
+    @discardableResult
+    public func withFieldProvider(fieldProvider: @escaping ((MKFormColorPickerCell) -> MKFormColorField)) -> Self {
+        self.fieldProvider = fieldProvider
+        return self
+    }
 }

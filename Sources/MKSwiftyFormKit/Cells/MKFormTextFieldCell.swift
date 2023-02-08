@@ -2,21 +2,26 @@ import UIKit
 
 open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
     
-    open var textField = UITextField()
-    public var textFieldShouldReturnHandler: ((MKFormTextFieldCell) -> Bool)?
-    public var textFieldShouldChangeCharactersInRangeHandler: ((MKFormTextFieldCell, NSRange, String) -> Bool)?
-    public var textFieldDidEndEditingHandler: ((MKFormTextFieldCell) -> Void)?
-    public var textFieldDidBeginEditingHandler: ((MKFormTextFieldCell) -> Void)?
-    public var textFieldEditingChangedHandler: ((MKFormTextFieldCell) -> Void)?
-    
     open private(set) var field = MKFormTextField(id: "")
+    open var fieldProvider: ((MKFormTextFieldCell) -> MKFormTextField) = { $0.field }
+    open var textFieldShouldReturnHandler: ((MKFormTextFieldCell) -> Bool)?
+    open var textFieldShouldChangeCharactersInRangeHandler: ((MKFormTextFieldCell, NSRange, String) -> Bool)?
+    open var textFieldDidEndEditingHandler: ((MKFormTextFieldCell) -> Void)?
+    open var textFieldDidBeginEditingHandler: ((MKFormTextFieldCell) -> Void)?
+    open var textFieldEditingChangedHandler: ((MKFormTextFieldCell) -> Void)?
     
-    public func refresh(field: MKFormTextField) {
+    open var textField = UITextField()
+    
+    open func refresh(field: MKFormTextField) {
         self.field = field
         textField.configure(field.textFieldConfiguration)
         textField.isUserInteractionEnabled = field.displayState.isEnabled
         textField.isEnabled = field.displayState.isEnabled
         setNeedsUpdateConfiguration()
+    }
+    
+    open func refreshWithFieldProvider() {
+        refresh(field: fieldProvider(self))
     }
     
     public init(size: AccessoryLayout.Size = .automatic) {
@@ -114,6 +119,12 @@ public extension MKFormTextFieldCell {
             guard let target else { return }
             handler(target, cell)
         }
+        return self
+    }
+    
+    @discardableResult
+    func withFieldProvider(fieldProvider: @escaping ((MKFormTextFieldCell) -> MKFormTextField)) -> Self {
+        self.fieldProvider = fieldProvider
         return self
     }
     

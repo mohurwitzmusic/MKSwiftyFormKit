@@ -3,18 +3,22 @@ import Combine
 
 open class MKFormSliderCell: MKFormCell {
     
-    public let slider = UISlider()
-    
+    open private(set) var field = MKFormSliderField(id: "")
+    open var fieldProvider: ((MKFormSliderCell) -> MKFormSliderField) = { $0.field }
     open var sliderValueChangedHandler: ((MKFormSliderCell) -> Void)?
     open var sliderTouchesEndedHandler: ((MKFormSliderCell) -> Void)?
     open var sliderTouchesBeganHandler: ((MKFormSliderCell) -> Void)?
-    open private(set) var field = MKFormSliderField(id: "")
+    public let slider = UISlider()
     
     open func refresh(field: MKFormSliderField, animated: Bool) {
         self.field = field
         self.isUserInteractionEnabled = field.displayState.isEnabled
         self.slider.isEnabled = field.displayState.isEnabled
         self.slider.setValue(field.value, animated: animated)
+    }
+    
+    open func refreshWithFieldProvider(animated: Bool) {
+        refresh(field: fieldProvider(self), animated: animated)
     }
 
     open override func setup() {
@@ -77,6 +81,12 @@ public extension MKFormSliderCell {
             guard let target else { return }
             handler(target, cell)
         }
+        return self
+    }
+    
+    @discardableResult
+    func withFieldProvider(fieldProvider: @escaping ((MKFormSliderCell) -> MKFormSliderField)) -> Self {
+        self.fieldProvider = fieldProvider
         return self
     }
 }

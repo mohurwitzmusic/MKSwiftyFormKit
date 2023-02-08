@@ -33,6 +33,7 @@ open class MKFormColorMenuCell : MKFormCell {
     open var selectionHandler: ((MKFormColorMenuCell) -> Void)?
     
     open private(set) var field = MKFormColorMenuField(id: "", menuItems: [], selectedColor: .gray)
+    open var fieldProvider: ((MKFormColorMenuCell) -> MKFormColorMenuField) = { $0.field }
     
     open var selectedColor: UIColor {
         get  { field.selectedColor }
@@ -49,7 +50,7 @@ open class MKFormColorMenuCell : MKFormCell {
         refresh(field: field)
     }
     
-    public func refresh(field: MKFormColorMenuField) {
+    open func refresh(field: MKFormColorMenuField) {
         self.field = field
         menuButton.configuration?.baseForegroundColor = field.selectedColor
         let menuActions = field.menuItems.map { menuItem in
@@ -61,6 +62,10 @@ open class MKFormColorMenuCell : MKFormCell {
         }
         menuButton.menu = .init(title: "Color", children: menuActions)
         contentConfiguration = field.contentConfiguration
+    }
+    
+    open func refreshWithFieldProvider() {
+        self.refresh(field: fieldProvider(self))
     }
     
     public required init?(coder: NSCoder) {
@@ -105,6 +110,12 @@ open class MKFormColorMenuCell : MKFormCell {
             guard let target else { return }
             handler(target, cell)
         }
+        return self
+    }
+    
+    @discardableResult
+    public func wihFieldProvider(fieldProvider: @escaping ((MKFormColorMenuCell) -> MKFormColorMenuField)) -> Self {
+        self.fieldProvider = fieldProvider
         return self
     }
     

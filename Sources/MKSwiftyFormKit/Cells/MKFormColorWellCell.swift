@@ -5,16 +5,22 @@ open class MKFormColorWellCell: MKFormCell {
     
     private var lastSentColor: UIColor?
     private let tapGesture = UITapGestureRecognizer()
+    
+    open private(set) var field = MKFormColorField(id: "", color: .gray)
+    open var fieldProvider: ((MKFormColorWellCell) -> MKFormColorField) = { $0.field }
     open var colorWell = UIColorWell()
     open var colorWellValueChangedHandler: ((MKFormColorWellCell) -> Void)?
-    open private(set) var field = MKFormColorField(id: "", color: .gray)
- 
+
     open func refresh(field: MKFormColorField) {
         self.field = field
         self.isUserInteractionEnabled =  field.displayState.isEnabled
         self.colorWell.isEnabled =  field.displayState.isEnabled
         self.contentConfiguration = field.contentConfiguration.updated(for: configurationState)
         self.colorWell.selectedColor = field.color
+    }
+    
+    open func refreshWithFieldProvider() {
+        self.refresh(field: fieldProvider(self))
     }
     
     open override func setup() {
@@ -50,6 +56,12 @@ public extension MKFormColorWellCell {
             guard let target else { return }
             handler(target, cell)
         }
+        return self
+    }
+    
+    @discardableResult
+    func withFieldProvider(fieldProvider: @escaping ((MKFormColorWellCell) -> MKFormColorField)) -> Self {
+        self.fieldProvider = fieldProvider
         return self
     }
     
