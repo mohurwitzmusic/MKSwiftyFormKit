@@ -37,7 +37,7 @@ open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
         NSLayoutConstraint.activate([
             openMenuButton.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
             openMenuButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -7),
-            openMenuButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
+            openMenuButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
         ])
         openMenuButton.configuration = .plain()
         openMenuButton.configuration?.imagePlacement = .trailing

@@ -5,6 +5,10 @@ public struct MKFormColorMenuField: MKFormField, UIListContentConfigurable {
     public struct MenuItem: Equatable {
         let name: String
         let color: UIColor
+        public init(name: String, color: UIColor) {
+            self.name = name
+            self.color = color
+        }
     }
     
     public let id: String
