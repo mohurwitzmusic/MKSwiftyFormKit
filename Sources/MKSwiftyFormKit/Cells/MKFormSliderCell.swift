@@ -58,6 +58,28 @@ open class MKFormSliderCell: MKFormCell {
 public extension MKFormSliderCell {
     
     @discardableResult
+    func onTouchesBegan(handler: @escaping ((MKFormSliderCell) -> Void)) -> Self {
+        self.sliderTouchesBeganHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func onValueChanged(handler: @escaping ((MKFormSliderCell) -> Void)) -> Self {
+        self.sliderValueChangedHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func onTouchesEnded(handler: @escaping ((MKFormSliderCell) -> Void)) -> Self {
+        self.sliderTouchesEndedHandler = handler
+        return self
+    }
+    
+}
+
+public extension MKFormSliderCell {
+    
+    @discardableResult
     func onTouchesBegan<T: AnyObject>(target: T, handler: @escaping ((T, MKFormSliderCell) -> Void)) -> Self {
         self.sliderTouchesBeganHandler =  { [weak target] cell in
             guard let target else { return }

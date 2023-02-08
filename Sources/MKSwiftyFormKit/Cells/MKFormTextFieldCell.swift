@@ -71,6 +71,40 @@ open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
     
 }
 
+public extension MKFormTextFieldCell {
+    
+    @discardableResult
+    func onTextFieldShouldReturn(handler: @escaping ((MKFormTextFieldCell) -> Bool)) -> Self {
+        self.textFieldShouldReturnHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func onTextFieldShouldCharactersInRange(handler: @escaping ((MKFormTextFieldCell, NSRange, String) -> Bool)) -> Self {
+        self.textFieldShouldChangeCharactersInRangeHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func onTextFieldDidEndEditing(handler: @escaping ((MKFormTextFieldCell) -> Void)) -> Self {
+        self.textFieldDidEndEditingHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func onTextFieldDidBeginEditing(handler: @escaping ((MKFormTextFieldCell) -> Void)) -> Self {
+        self.textFieldDidBeginEditingHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func onTextFieldEditingChanged(handler: @escaping ((MKFormTextFieldCell) -> Void)) -> Self {
+        self.textFieldEditingChangedHandler = handler
+        return self
+    }
+    
+}
+
 
 public extension MKFormTextFieldCell {
     
