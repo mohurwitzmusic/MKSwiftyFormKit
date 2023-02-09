@@ -1,10 +1,9 @@
 import UIKit
 
-public struct MKFormHeaderFooter: Identifiable, Hashable, UIListContentConfigurable {
+public struct MKFormHeaderFooterField: Identifiable, Hashable, UIListContentConfigurable {
     
     public let id: String
     public var contentConfiguration: UIListContentConfiguration
-    
     
     public init(id: String) {
         self.id = id

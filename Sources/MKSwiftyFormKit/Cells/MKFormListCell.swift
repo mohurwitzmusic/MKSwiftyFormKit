@@ -2,7 +2,7 @@ import UIKit
 
 open class MKFormListCell: MKFormCell {
     
-    open var fieldProvider: ((MKFormListCell) -> MKFormListField) = { $0.field }
+    open var fieldUpdateHandler: ((MKFormListCell) -> MKFormListField) = { $0.field }
     open private(set) var field = MKFormListField(id: "")
     
     open func refresh(field: MKFormListField) {
@@ -12,13 +12,13 @@ open class MKFormListCell: MKFormCell {
         self.accessoryType = field.accessoryType
     }
     
-    open func refreshWithFieldProvider() {
-        self.refresh(field: fieldProvider(self))
+    open func refreshWithFieldUpdateHandler() {
+        self.refresh(field: fieldUpdateHandler(self))
     }
     
     @discardableResult
-    public func withFieldProvider(fieldProvider: @escaping ((MKFormListCell) -> MKFormListField)) -> Self {
-        self.fieldProvider = fieldProvider
+    public func withFieldUpdateHandler(handler: @escaping ((MKFormListCell) -> MKFormListField)) -> Self {
+        self.fieldUpdateHandler = handler
         return self
     }
     

@@ -3,7 +3,7 @@ import UIKit
 open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
     
     open private(set) var field = MKFormTextField(id: "")
-    open var fieldProvider: ((MKFormTextFieldCell) -> MKFormTextField) = { $0.field }
+    open var fieldUpdateHandler: ((MKFormTextFieldCell) -> MKFormTextField) = { $0.field }
     open var textFieldShouldReturnHandler: ((MKFormTextFieldCell) -> Bool)?
     open var textFieldShouldChangeCharactersInRangeHandler: ((MKFormTextFieldCell, NSRange, String) -> Bool)?
     open var textFieldDidEndEditingHandler: ((MKFormTextFieldCell) -> Void)?
@@ -20,8 +20,8 @@ open class MKFormTextFieldCell: MKFormCell, UITextFieldDelegate {
         setNeedsUpdateConfiguration()
     }
     
-    open func refreshWithFieldProvider() {
-        refresh(field: fieldProvider(self))
+    open func refreshWithFieldUpdateHandler() {
+        refresh(field: fieldUpdateHandler(self))
     }
     
     public init(size: AccessoryLayout.Size = .automatic) {
@@ -157,8 +157,8 @@ public extension MKFormTextFieldCell {
     }
     
     @discardableResult
-    func withFieldProvider(fieldProvider: @escaping ((MKFormTextFieldCell) -> MKFormTextField)) -> Self {
-        self.fieldProvider = fieldProvider
+    func withFieldUpdateHandler(handler: @escaping ((MKFormTextFieldCell) -> MKFormTextField)) -> Self {
+        self.fieldUpdateHandler = handler
         return self
     }
     

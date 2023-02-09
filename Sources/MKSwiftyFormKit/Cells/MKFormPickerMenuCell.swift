@@ -6,7 +6,7 @@ open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
     
     open private(set) var field: MKFormPickerMenuField<T>?
     open var selectionHandler: ((MKFormPickerMenuCell, T) -> Void)?
-    open var fieldProvider: ((MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>?) = { $0.field }
+    open var fieldUpdateHandler: ((MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>?) = { $0.field }
     public let openMenuButton = UIButton(configuration: .plain())
 
         
@@ -25,8 +25,8 @@ open class MKFormPickerMenuCell<T: Equatable>: MKFormCell {
         openMenuButton.menu = UIMenu(children: actions)
     }
     
-    open func refreshWithFieldProvider() {
-        if let field = fieldProvider(self) {
+    open func refreshWithFieldUpdateHandler() {
+        if let field = fieldUpdateHandler(self) {
             refresh(field: field)
         }
     }
@@ -72,8 +72,8 @@ public extension MKFormPickerMenuCell {
     }
 
     @discardableResult
-    func withFieldProvider(fieldProvider: @escaping (MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>) -> Self {
-        self.fieldProvider = fieldProvider
+    func withFieldUpdateHandler(handler: @escaping (MKFormPickerMenuCell<T>) -> MKFormPickerMenuField<T>) -> Self {
+        self.fieldUpdateHandler = handler
         return self
     }
 }

@@ -1,10 +1,30 @@
 import UIKit
 import Combine
 
+protocol MKFormFieldUpdateHandling: AnyObject {
+    associatedtype Field : MKFormField
+    var fieldUpdateHandler: ((Self) -> Field) { get set }
+    func refresh(field: Field, animated: Bool)
+}
+
+extension MKFormFieldUpdateHandling {
+    
+    func refreshWithFieldUpdateHandler(animated: Bool) {
+        self.refresh(field: fieldUpdateHandler(self), animated: animated)
+    }
+    
+    @discardableResult
+    func withFieldUpdateHandler(handler: @escaping ((Self) -> Field)) -> Self {
+        self.fieldUpdateHandler = handler
+        return self
+    }
+    
+}
+
 open class MKFormSliderCell: MKFormCell {
     
     open private(set) var field = MKFormSliderField(id: "")
-    open var fieldProvider: ((MKFormSliderCell) -> MKFormSliderField) = { $0.field }
+    open var fieldUpdateHandler: ((MKFormSliderCell) -> MKFormSliderField) = { $0.field }
     open var sliderValueChangedHandler: ((MKFormSliderCell) -> Void)?
     open var sliderTouchesEndedHandler: ((MKFormSliderCell) -> Void)?
     open var sliderTouchesBeganHandler: ((MKFormSliderCell) -> Void)?
@@ -17,8 +37,8 @@ open class MKFormSliderCell: MKFormCell {
         self.slider.setValue(field.value, animated: animated)
     }
     
-    open func refreshWithFieldProvider(animated: Bool) {
-        refresh(field: fieldProvider(self), animated: animated)
+    open func refreshWithFieldUpdateHandler(animated: Bool) {
+        refresh(field: fieldUpdateHandler(self), animated: animated)
     }
 
     open override func setup() {
@@ -107,8 +127,11 @@ public extension MKFormSliderCell {
     }
     
     @discardableResult
-    func withFieldProvider(fieldProvider: @escaping ((MKFormSliderCell) -> MKFormSliderField)) -> Self {
-        self.fieldProvider = fieldProvider
+    func withFieldUpdateHandler(handler: @escaping ((MKFormSliderCell) -> MKFormSliderField)) -> Self {
+        self.fieldUpdateHandler = handler
         return self
     }
 }
+
+
+

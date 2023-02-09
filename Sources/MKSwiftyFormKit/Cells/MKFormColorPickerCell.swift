@@ -15,7 +15,7 @@ open class MKFormColorPickerCell: MKFormCell {
     }
     
     open private(set) var field: MKFormColorField = .init(id: "", color: .gray)
-    open var fieldProvider: ((MKFormColorPickerCell) -> MKFormColorField) = { $0.field }
+    open var fieldUpdateHandler: ((MKFormColorPickerCell) -> MKFormColorField) = { $0.field }
 
     
     open func refresh(field: MKFormColorField) {
@@ -27,8 +27,8 @@ open class MKFormColorPickerCell: MKFormCell {
     }
     
     
-    open func refreshWithFieldProvider() {
-        self.refresh(field: fieldProvider(self))
+    open func refreshWithFieldUpdateHandler() {
+        self.refresh(field: fieldUpdateHandler(self))
     }
     
     open override func setup() {
@@ -54,8 +54,8 @@ open class MKFormColorPickerCell: MKFormCell {
      }
     
     @discardableResult
-    public func withFieldProvider(fieldProvider: @escaping ((MKFormColorPickerCell) -> MKFormColorField)) -> Self {
-        self.fieldProvider = fieldProvider
+    public func withFieldUpdateHandler(handler: @escaping ((MKFormColorPickerCell) -> MKFormColorField)) -> Self {
+        self.fieldUpdateHandler = handler
         return self
     }
 }

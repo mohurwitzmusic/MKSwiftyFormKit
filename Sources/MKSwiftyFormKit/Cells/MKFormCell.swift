@@ -128,3 +128,24 @@ open class MKFormCell: UITableViewCell {
 
 
 
+/*
+ protocol MKFormFieldUpdateHandling: AnyObject {
+     associatedtype Field : MKFormField
+     var fieldUpdateHandler: ((Self) -> Field) { get set }
+     func refresh(field: Field, animated: Bool)
+ }
+
+ extension MKFormFieldUpdateHandling {
+     
+     func refreshWithFieldUpdateHandler(animated: Bool) {
+         self.refresh(field: fieldUpdateHandler(self), animated: animated)
+     }
+     
+     @discardableResult
+     func withFieldUpdateHandler(handler: @escaping ((Self) -> Field)) -> Self {
+         self.fieldUpdateHandler = handler
+         return self
+     }
+     
+ }
+ */
